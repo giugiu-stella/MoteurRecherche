@@ -33,9 +33,23 @@ class BookDetail(APIView):
         return Response(serializer.data)
 
 
-class EnglishBookList(APIView):
+class LanguageBookList(APIView):
 
-    def get(self, request, format=None):
-        english_books = Book.objects.filter(languages__code='eng')
+    def get(self, request, language, format=None):
+        english_books = Book.objects.filter(languages__code=language)
         serializer = BookSerializer(english_books, many=True)
         return Response(serializer.data)
+
+
+class NameBookList(APIView):
+    def get(self, request, name_recherche, format=None):
+        resultats = Book.objects.filter(title__icontains=name_recherche)
+        serializer = BookSerializer(resultats, many=True)
+        return Response(serializer.data)
+    
+class AuthorNameBookList(APIView):
+    def get(self, request, name_recherche, format=None):
+        resultats = Book.objects.filter(authors__name__icontains=name_recherche)
+        serializer = BookSerializer(resultats, many=True)
+        return Response(serializer.data)
+    

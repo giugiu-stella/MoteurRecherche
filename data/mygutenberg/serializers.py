@@ -36,6 +36,8 @@ class BookSerializer(serializers.ModelSerializer):
             'authors',
             'subjects',
             'languages',
+            'cover_image',
+            'plain_text',
             'download_count'
         )
 
