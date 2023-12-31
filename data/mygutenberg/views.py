@@ -41,15 +41,28 @@ class LanguageBookList(APIView):
         return Response(serializer.data)
 
 
-class NameBookList(APIView):
-    def get(self, request, name_recherche, format=None):
-        resultats = Book.objects.filter(title__icontains=name_recherche)
+class TitleBookList(APIView):
+    def get(self, request, title, format=None):
+        resultats = Book.objects.filter(title__icontains=title)
+        serializer = BookSerializer(resultats, many=True)
+        return Response(serializer.data)
+    
+    
+class TitleRegexBookList(APIView):
+    def get(self, request, title, format=None):
+        resultats = Book.objects.filter(title__regex=title)
         serializer = BookSerializer(resultats, many=True)
         return Response(serializer.data)
     
 class AuthorNameBookList(APIView):
-    def get(self, request, name_recherche, format=None):
-        resultats = Book.objects.filter(authors__name__icontains=name_recherche)
+    def get(self, request, name, format=None):
+        resultats = Book.objects.filter(authors__name__icontains=name)
+        serializer = BookSerializer(resultats, many=True)
+        return Response(serializer.data)
+    
+class AuthorRegexNameBookList(APIView):
+    def get(self, request, name, format=None):
+        resultats = Book.objects.filter(authors__name__regex=name)
         serializer = BookSerializer(resultats, many=True)
         return Response(serializer.data)
     

@@ -3,7 +3,7 @@ from mygutenberg.models import *
 import json
 import requests
 import re
-from mygutenberg.config import URL_INIT_BIBLIOTHEQUE, NB_LIVRE_BIBLIOTHEQUE, NB_MOTS_LIVRES
+from mygutenberg.config import URL_INIT_BIBLIOTHEQUE, MIN_NB_LIVRE_BIBLIOTHEQUE, MIN_NB_MOTS_LIVRES
 import time
 
 
@@ -85,13 +85,13 @@ class Command(BaseCommand):
         nb_livres = 0
         url = URL_INIT_BIBLIOTHEQUE
 
-        while nb_livres < NB_LIVRE_BIBLIOTHEQUE:
+        while nb_livres < MIN_NB_LIVRE_BIBLIOTHEQUE:
             reponse = requests.get(url)
             json_data = reponse.json()
 
             for book in json_data['results']:
                 try:
-                    if compter_mots(book['formats']['text/plain; charset=us-ascii']) >= NB_MOTS_LIVRES:
+                    if compter_mots(book['formats']['text/plain; charset=us-ascii']) >= MIN_NB_MOTS_LIVRES:
                         print(book['title'])
                         put_book_db(book)
                         nb_livres += 1
