@@ -34,7 +34,6 @@ class BookDetail(APIView):
 
 
 class LanguageBookList(APIView):
-
     def get(self, request, language, format=None):
         english_books = Book.objects.filter(languages__code=language)
         serializer = BookSerializer(english_books, many=True)
