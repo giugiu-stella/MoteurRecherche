@@ -1,14 +1,17 @@
 import requests
-import Jaccard
+from server.Jaccard import distance_jaccard
 
 #voir Jaccard.py
+
+def sort(search):
+    return sort_par_titre(search)
 
 def sort_par_titre(search):
     ListNomDist = []
     comparatif = getTitle(search[0])
     for json in search:
-        #la division sert à normaliser la distance pour limiter l'impact de la longueur de la String mais ça ne marche pas super bien
-        ListNomDist.append((getTitle(json), Jaccard.distance_jaccard(comparatif, getTitle(json)) / ((len(comparatif.split()) + len(getTitle(json).split())) / 2)))
+        #la division sert ï¿½ normaliser la distance pour limiter l'impact de la longueur de la String mais ï¿½a ne marche pas super bien
+        ListNomDist.append((getTitle(json), distance_jaccard(comparatif, getTitle(json)) / ((len(comparatif.split()) + len(getTitle(json).split())) / 2)))
         
     livres_tries = sorted(ListNomDist, key=lambda x: x[1])
     
