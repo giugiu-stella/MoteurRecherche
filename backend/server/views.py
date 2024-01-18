@@ -15,8 +15,6 @@ def redirect_data(url_end_requete, search_argument : str = None):
         url_end_requete = construct_url_requete_search(url_end_requete) + search_argument
     url_requete = construct_url_requete_data(url_end_requete)
     results = requests.get(url_requete)
-    print(f'url_requete : {url_requete}')
-    print(results.status_code)
     return results.json()
 
 def redirect_data_sort(url_end_requete, search_argument=None):

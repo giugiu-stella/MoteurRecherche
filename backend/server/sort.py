@@ -4,7 +4,8 @@ from server.Jaccard import distance_jaccard
 #voir Jaccard.py
 
 def sort(search):
-    return sort_par_titre(search)
+    print(len(search))
+    return sort_by_popularity(search)
 
 def sort_par_titre(search):
     ListNomDist = []
@@ -18,6 +19,13 @@ def sort_par_titre(search):
     return livres_tries
 
 
+#Trie une liste de manière décroissante en utilisant la fonction pour décider l'ordre entre les éléments
+def sort_list_search(search, f):
+    return sorted(search, key=f, reverse=True)
+
+def sort_by_popularity(search):
+    return sort_list_search(search, lambda x: x["download_count"])
+    
 def getText(json):
     url_text = json["plain_text"]
     return requests.get(url_text).text
@@ -104,4 +112,4 @@ test = [{
 }]
 
 
-print(sort_par_titre(test))
+#print(sort_par_titre(test))
