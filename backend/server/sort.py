@@ -1,5 +1,5 @@
 import requests
-from server.Jaccard import distance_jaccard
+from Jaccard import distance_jaccard
 
 #voir Jaccard.py
 
@@ -18,6 +18,15 @@ def sort_par_titre(search):
     
     return livres_tries
 
+def sort_mot_cle_contenu(search, mot) :
+    ListNomOccurence = []
+    for json in search:
+        ListNomOccurence.append((getTitle(json), getOccurencesText(getText(json), mot)))
+        
+    livres_tries = sort_list_search(ListNomOccurence,lambda x: x[1])
+    
+    return livres_tries
+
 
 #Trie une liste de manière décroissante en utilisant la fonction pour décider l'ordre entre les éléments
 def sort_list_search(search, f):
@@ -32,6 +41,12 @@ def getText(json):
 
 def getTitle(json):
     return json["title"]
+
+def getOccurencesText(text,compare) :
+    listText = text.lower().split()
+    return listText.count(compare.lower())
+
+
 
 
 test = [{
@@ -82,7 +97,7 @@ test = [{
         "en"
     ],
     "cover_image": "https://www.gutenberg.org/cache/epub/84/pg84.cover.medium.jpg",
-    "plain_text": "https://www.gutenberg.org/ebooks/84.txt.utf-8",
+    "plain_text": "https://www.gutenberg.org/ebooks/145.txt.utf-8",
     "download_count": 91860
 },{
     "id": 84,
@@ -107,9 +122,9 @@ test = [{
         "en"
     ],
     "cover_image": "https://www.gutenberg.org/cache/epub/84/pg84.cover.medium.jpg",
-    "plain_text": "https://www.gutenberg.org/ebooks/84.txt.utf-8",
+    "plain_text": "https://www.gutenberg.org/ebooks/1342.txt.utf-8",
     "download_count": 91860
 }]
 
-
+print(sort_mot_cle_contenu(test, "Science"))
 #print(sort_par_titre(test))
