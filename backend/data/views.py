@@ -1,8 +1,8 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.http import Http404
-from data.models import Book
-from data.serializers import BookSerializer
+from data.models import Book, Neighbors
+from data.serializers import BookSerializer, NeighborsSerializer
 
 # Create your views here.
 
@@ -64,4 +64,18 @@ class AuthorRegexNameBookList(APIView):
         resultats = Book.objects.filter(authors__name__regex=name)
         serializer = BookSerializer(resultats, many=True)
         return Response(serializer.data)
+    
+class NeighboorsBook(APIView):
+    def get_object(self, pk):
+        try:
+            return Book.objects.get(pk=pk)
+        except Book.DoesNotExist:
+            raise Http404
+    def get(self, request, pk, format=None):
+        book = self.get_object(pk)
+        voisins = Neighbors.objects.filter(book=book)
+
+        voisins = [v.neighbor for v in voisins]
+        serializer = BookSerializer(voisins, many=True)
+        return Response(serializer.data)    
     

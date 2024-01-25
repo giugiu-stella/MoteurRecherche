@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.postgres.fields import ArrayField
 
 # Create your models here.
 
@@ -35,3 +36,12 @@ class Person(models.Model):
 
 class Subject(models.Model):
     name = models.CharField(max_length=256)
+    
+"""class GraphJaccard(models.Model):
+    id = models.PositiveIntegerField(primary_key=True)
+    neighbor = ArrayField(models.PositiveIntegerField(), blank=True, null=False)"""
+    
+class Neighbors(models.Model):
+    book = models.ForeignKey(Book, on_delete=models.CASCADE, related_name='neighbors_as_book')
+    neighbor = models.ForeignKey(Book, on_delete=models.CASCADE, related_name='neighbors_as_neighbor')
+

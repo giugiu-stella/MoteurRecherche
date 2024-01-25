@@ -1,22 +1,18 @@
 import requests
-from Jaccard import distance_jaccard
+from server.graph import Graph, Node
+from data.config import URL_BASE_DATA
+from backend.config import URL_NEIGHBOR, URL_BASE, construct_url_requete_search
 
-#voir Jaccard.py
+URL_REQUETE_NEIGHBOR = URL_BASE + URL_BASE_DATA + URL_NEIGHBOR
+NUMBER_SUGGESTION = 10
 
+#Sort by popularity
 def sort(search):
-    print(len(search))
-    return sort_by_popularity(search)
+    #book_sorted = sort_by_popularity(search)
+    book_sorted = sort_by_betwenness_centrality(search)
 
-def sort_par_titre(search):
-    ListNomDist = []
-    comparatif = getTitle(search[0])
-    for json in search:
-        #la division sert � normaliser la distance pour limiter l'impact de la longueur de la String mais �a ne marche pas super bien
-        ListNomDist.append((getTitle(json), distance_jaccard(comparatif, getTitle(json)) / ((len(comparatif.split()) + len(getTitle(json).split())) / 2)))
-        
-    livres_tries = sorted(ListNomDist, key=lambda x: x[1])
-    
-    return livres_tries
+    return {"result" : book_sorted, "suggestion" : suggestion(book_sorted)}
+
 
 def sort_mot_cle_contenu(search, mot) :
     ListNomOccurence = []
@@ -28,7 +24,7 @@ def sort_mot_cle_contenu(search, mot) :
     return livres_tries
 
 
-#Trie une liste de manière décroissante en utilisant la fonction pour décider l'ordre entre les éléments
+#Trie une liste de manière décroissante en utilisant la fonction f pour décider l'ordre entre les éléments
 def sort_list_search(search, f):
     return sorted(search, key=f, reverse=True)
 
@@ -46,85 +42,46 @@ def getOccurencesText(text,compare) :
     listText = text.lower().split()
     return listText.count(compare.lower())
 
+def suggestion(result_search):
+    book_suggestion = []
+    book_suggestion_id = set()
+    number_book_in_suggestion = 0
+    id_result_search = [book['id'] for book in result_search]
+    
+    for n in result_search:  
+        url_requete = construct_url_requete_search(URL_REQUETE_NEIGHBOR) + str(n['id'])
+        results = requests.get(url_requete)
+        
+        for book in results.json():
+            if book['id'] not in book_suggestion_id and book['id'] not in id_result_search:
+                number_book_in_suggestion += 1
+                book_suggestion.append(book)
+                if number_book_in_suggestion >= NUMBER_SUGGESTION:
+                    return book_suggestion
+        
+    return book_suggestion
 
 
+def intersection(lst1, lst2):
+    return list(set(lst1) & set(lst2))
 
-test = [{
-    "id": 84,
-    "title": "Frankenstein; Or, The Modern Prometheus",
-    "authors": [
-        {
-            "name": "Shelley, Mary Wollstonecraft",
-            "birth_year": 1797,
-            "death_year": 1851
-        }
-    ],
-    "subjects": [
-        "Frankenstein's monster (Fictitious character) -- Fiction",
-        "Frankenstein, Victor (Fictitious character) -- Fiction",
-        "Gothic fiction",
-        "Horror tales",
-        "Monsters -- Fiction",
-        "Science fiction",
-        "Scientists -- Fiction"
-    ],
-    "languages": [
-        "en"
-    ],
-    "cover_image": "https://www.gutenberg.org/cache/epub/84/pg84.cover.medium.jpg",
-    "plain_text": "https://www.gutenberg.org/ebooks/84.txt.utf-8",
-    "download_count": 91860
-},{
-    "id": 84,
-    "title": "test de titre gogogo",
-    "authors": [
-        {
-            "name": "Shelley, Mary Wollstonecraft",
-            "birth_year": 1797,
-            "death_year": 1851
-        }
-    ],
-    "subjects": [
-        "Frankenstein's monster (Fictitious character) -- Fiction",
-        "Frankenstein, Victor (Fictitious character) -- Fiction",
-        "Gothic fiction",
-        "Horror tales",
-        "Monsters -- Fiction",
-        "Science fiction",
-        "Scientists -- Fiction"
-    ],
-    "languages": [
-        "en"
-    ],
-    "cover_image": "https://www.gutenberg.org/cache/epub/84/pg84.cover.medium.jpg",
-    "plain_text": "https://www.gutenberg.org/ebooks/145.txt.utf-8",
-    "download_count": 91860
-},{
-    "id": 84,
-    "title": "Le retour de Frankenstein",
-    "authors": [
-        {
-            "name": "Shelley, Mary Wollstonecraft",
-            "birth_year": 1797,
-            "death_year": 1851
-        }
-    ],
-    "subjects": [
-        "Frankenstein's monster (Fictitious character) -- Fiction",
-        "Frankenstein, Victor (Fictitious character) -- Fiction",
-        "Gothic fiction",
-        "Horror tales",
-        "Monsters -- Fiction",
-        "Science fiction",
-        "Scientists -- Fiction"
-    ],
-    "languages": [
-        "en"
-    ],
-    "cover_image": "https://www.gutenberg.org/cache/epub/84/pg84.cover.medium.jpg",
-    "plain_text": "https://www.gutenberg.org/ebooks/1342.txt.utf-8",
-    "download_count": 91860
-}]
+def sort_by_betwenness_centrality(search):
+    G = Graph()
+    for book in search:
+        G.add_node(book)
+    
+    for n in G.nodes:
+        for m in G.nodes:
+            if n == m or m in n.neighbors:
+                continue
+            
+            if intersection(m.json["subjects"], n.json["subjects"]) != []:
+                G.add_edge(n, m)
+        
+    G.calculate_betweenness_centrality()
+    G.sort_nodes_by_centrality_measure()
+    
+    return [n.json for n in G.nodes]
 
-print(sort_mot_cle_contenu(test, "Science"))
-#print(sort_par_titre(test))
+if __name__ == "__main__":
+    print(construct_url_requete_search(URL_REQUETE_NEIGHBOR))

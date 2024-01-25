@@ -15,4 +15,5 @@ urlpatterns = [
     path(construct_url_data(URL_SEARCH_REGEX_BOOKS_TITLE), views.TitleRegexBookList.as_view()),
     path(construct_url_data(URL_SEARCH_BOOKS_NAME_AUTHOR), views.AuthorNameBookList.as_view()),
     path(construct_url_data(URL_SEARCH_REGEX_BOOKS_NAME_AUTHOR), views.AuthorRegexNameBookList.as_view()),
+    path(construct_url_data(URL_NEIGHBOR), views.NeighboorsBook.as_view()),
 ]

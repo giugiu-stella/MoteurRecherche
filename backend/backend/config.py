@@ -7,6 +7,7 @@ URL_SEARCH_REGEX = 'books/regex/'
 URL_SEARCH_REGEX_BOOKS_TITLE = URL_SEARCH_REGEX + 'title/<str:title>/'
 URL_SEARCH_BOOKS_NAME_AUTHOR = 'books/authors/name/<str:name>/'
 URL_SEARCH_REGEX_BOOKS_NAME_AUTHOR = URL_SEARCH_REGEX + 'authors/name/<str:name>/'
+URL_NEIGHBOR = "books/neighbors/<int:pk>"
 
-def construct_url_requete_search(url):
+def construct_url_requete_search(url : str) -> str:
     return url.split('<')[0]
