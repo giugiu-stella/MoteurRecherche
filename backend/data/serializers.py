@@ -46,10 +46,10 @@ class BookSerializer(serializers.ModelSerializer):
 
     def get_languages(self, book):
         languages = [language.code for language in book.languages.all()]
-        languages.sort()
+        #languages.sort()
         return languages
 
     def get_subjects(self, book):
         subjects = [subject.name for subject in book.subjects.all()]
-        subjects.sort()
+        #subjects.sort()
         return subjects

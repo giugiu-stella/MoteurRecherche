@@ -11,7 +11,7 @@ def sort(search):
     #book_sorted = sort_by_popularity(search)
     book_sorted = sort_by_betwenness_centrality(search)
 
-    return {"result" : book_sorted, "suggestion" : suggestion(book_sorted)}
+    return {"result" : book_sorted, "suggestion" : suggestion([b['id'] for b in book_sorted])}
 
 
 def sort_mot_cle_contenu(search, mot) :
@@ -42,18 +42,17 @@ def getOccurencesText(text,compare) :
     listText = text.lower().split()
     return listText.count(compare.lower())
 
-def suggestion(result_search):
+def suggestion(book_ids):
     book_suggestion = []
     book_suggestion_id = set()
     number_book_in_suggestion = 0
-    id_result_search = [book['id'] for book in result_search]
     
-    for n in result_search:  
-        url_requete = construct_url_requete_search(URL_REQUETE_NEIGHBOR) + str(n['id'])
+    for identifiant in book_ids:  
+        url_requete = construct_url_requete_search(URL_REQUETE_NEIGHBOR) + str(identifiant)
         results = requests.get(url_requete)
         
         for book in results.json():
-            if book['id'] not in book_suggestion_id and book['id'] not in id_result_search:
+            if identifiant not in book_suggestion_id and identifiant not in book_ids:
                 number_book_in_suggestion += 1
                 book_suggestion.append(book)
                 if number_book_in_suggestion >= NUMBER_SUGGESTION:
