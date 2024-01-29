@@ -1,0 +1,12 @@
+# Default ignored files
+/shelf/
+/workspace.xml
+src/.idea
+*.pyc
+**/*.pyc
+__pycache__
+*/__pycache__
+src/test.py
+*/.vscode
+.vscode
+.env/
