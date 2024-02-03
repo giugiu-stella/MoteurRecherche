@@ -1,59 +1,31 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 import requests
-from backend.config import *
 from data.config import URL_BASE_DATA
-from server.sort import sort
-
-URL_BASE_REQUETE = URL_BASE + URL_BASE_DATA
-
-def construct_url_requete_data(url):
-    return URL_BASE_REQUETE + url
-
-def redirect_data(url_end_requete, search_argument : str = None):
-    if search_argument is not None:
-        url_end_requete = construct_url_requete_search(url_end_requete) + search_argument
-    url_requete = construct_url_requete_data(url_end_requete)
-    results = requests.get(url_requete)
-    return results.json()
-
-def redirect_data_sort(url_end_requete, search_argument=None):
-    results_search = redirect_data(url_end_requete, search_argument)
-    result_sort = sort(results_search)
-    return Response(result_sort)
+from server.config import URL_BASE_SERVER
+from server.sort import sort_search, suggestion
+from server.centrality import Centrality
 
 
-class BookList(APIView):
-    """
-    List all books.
-    """
+
+class BooksList(APIView):
     def get(self, request, format=None):
-        return redirect_data_sort(URL_SEARCH_BOOKS)
+        url = request.build_absolute_uri()
+        url = url.replace(URL_BASE_SERVER, URL_BASE_DATA)
+        #print(f"data {url}")
+        results = requests.get(url)
+        #print(results.status_code)
+        results = results.json()
+        
+        sort = self.request.GET.get('sort')
+        if sort == 'closeness':
+            results = sort_search(results, Centrality.CLOSENESS)
+        elif sort == 'betweenness':
+            results = sort_search(results, Centrality.BETWEENNESS)
+            
+        {"result" : results, "suggestion" : suggestion([b['id'] for b in results])}
+        return Response(results)
+        #return Response(dict())
 
-
-class BookDetail(APIView):
-    def get(self, request, pk, format=None):
-        result_search = redirect_data(URL_SEARCH_BOOK_ID, str(pk))
-        return Response(result_search)
-
-class TitleBookList(APIView):
-    def get(self, request, title, format=None):
-        return redirect_data_sort(URL_SEARCH_BOOKS_TITLE, title)
-    
-class TitleRegexBookList(APIView):
-    def get(self, request, title, format=None):
-        return redirect_data_sort(URL_SEARCH_BOOKS_TITLE, title)
-    
-class LanguageBookList(APIView):
-    def get(self, request, language, format=None):
-        return redirect_data_sort(URL_SEARCH_BOOKS_LANGUAGE, language)
-    
-class AuthorNameBookList(APIView):
-    def get(self, request, name, format=None):
-        return redirect_data_sort(URL_SEARCH_BOOKS_NAME_AUTHOR, name)
-    
-class AuthorRegexNameBookList(APIView):
-    def get(self, request, name, format=None):
-        return redirect_data_sort(URL_SEARCH_REGEX_BOOKS_NAME_AUTHOR, name)
     
     
