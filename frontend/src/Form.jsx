@@ -40,7 +40,7 @@ function MyForm() {
       mode: "cors",
     })
       .then((response) => response.json())
-      .then((result) => result)
+      .then((result) => setBookData(result))
       .catch((error) => console.error("Error fetching the books:", error));
   };
 
@@ -122,7 +122,6 @@ function MyForm() {
     },
     bookContainer: {
       display: "flex",
-      flexDirection: "row",
       justifyContent: "space-between",
       marginBottom: "20px",
     },
