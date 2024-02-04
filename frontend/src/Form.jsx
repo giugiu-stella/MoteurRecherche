@@ -14,7 +14,7 @@ function MyForm () {
     const [author, setAuthor] = useState('');
     const [selectedAuthorType, setSelectedAuthorType] = useState('classique');
 
-    const [bookData, setBookData] = useState(null);
+    const [bookData, setBookData] = useState({'result' : [], 'suggestion' : []});
 
     
     const onSubmit = () => {
@@ -40,7 +40,7 @@ function MyForm () {
             mode: 'cors',
         })
         .then((response) => response.json())
-        .then((result) => console.log(result) & setBookData(result))
+        .then((result) => result)
         .catch((error) => console.error('Error fetching the books:', error));
       
     };
@@ -137,6 +137,7 @@ function MyForm () {
         ))}
         </div>
     </div>
+    
       </div> 
       
     );

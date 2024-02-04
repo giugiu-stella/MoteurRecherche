@@ -1,4 +1,4 @@
-.ontainer {
+.container {
     display: flex;
     flex-wrap: wrap;
   }
@@ -13,15 +13,7 @@
     height: 450px;
   }
 
-  .container {
-    display: flex;
-  }
-  
-  .books-column, .suggestions-column {
-    margin: 10px;
-    padding: 10px;
-    border: 1px solid #ddd;
-  }
+
   
   .books-column {
     flex: 2; /* Utilise 2 parts de l'espace disponible */
