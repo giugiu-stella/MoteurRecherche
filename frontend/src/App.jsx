@@ -26,22 +26,10 @@ function App() {
         </p>
       </div>
       <p className="read-the-docs">
-        Click on the Vite
+        Click on the Vite and React logos to learn more
       </p>
-      {/*<input
-   type="search"
-   placeholder="Search here"
-   onChange={handleChange}
-  value={searchInput} />*/}
-  </> 
+    </>
   )
 }
-
-{/*function App() {
-  return (
-     <div classname='App'>
-       <BookSearch/>
-     </div>
-)}*/}
 
 export default App

@@ -1,0 +1,33 @@
+.ontainer {
+    display: flex;
+    flex-wrap: wrap;
+  }
+  
+  .books-column, .suggestions-column {
+    margin: 10px; /* Espace entre les livres */
+    padding: 10px;
+    border: none; /* Bordure pour séparer les livres */
+    word-wrap: break-word;
+    max-width: 300px;
+    width: 200px; 
+    height: 450px;
+  }
+
+  .container {
+    display: flex;
+  }
+  
+  .books-column, .suggestions-column {
+    margin: 10px;
+    padding: 10px;
+    border: 1px solid #ddd;
+  }
+  
+  .books-column {
+    flex: 2; /* Utilise 2 parts de l'espace disponible */
+  }
+  
+  .suggestions-column {
+    flex: 1; /* Utilise 1 part de l'espace disponible */
+  }
+  
