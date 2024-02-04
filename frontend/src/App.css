@@ -1,3 +1,5 @@
+/* book.css */
+
 #root {
   max-width: 1280px;
   margin: 0 auto;
@@ -39,4 +41,16 @@
 
 .read-the-docs {
   color: #888;
+}
+
+.custom-label {
+  display: block;
+  margin-bottom: 0.5em;
+}
+
+.custom-input {
+  margin-left: 10px;
+  padding: 5px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
 }
