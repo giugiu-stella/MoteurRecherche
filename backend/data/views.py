@@ -9,47 +9,14 @@ from data.serializers import BookSerializer
 
 
 class BookViewSet(APIView):
-    queryset = Book.objects.exclude(download_count__isnull=True)
-    queryset = queryset.exclude(title__isnull=True)
-    serializer_class = BookSerializer
     
     def get(self, request, format=None):
+        queryset = Book.objects.exclude(download_count__isnull=True)
+        queryset = queryset.exclude(title__isnull=True)
+        
         language = request.GET.get('language')
-        search_keyword = request.GET.get('keyword')
-        if search_keyword is not None:
-            querysets = []
-            if language is not None:
-                if language == 'en':
-                    querysets.append(KeywordsEnglish.objects.all())
-                elif language == 'fr':
-                    querysets.append(KeywordsFrench.objects.all())
-                else:
-                    querysets.append(KeywordsEnglish.objects.all())
-            else:
-                querysets.append(KeywordsEnglish.objects.all())
-            
-            
-            search_keywords_type = request.GET.get('keyword_type')
-            search_keywords_type = "classique" if search_keywords_type is None else search_keywords_type
-            
-            if search_keywords_type == "classique":
-                querysets = [q.filter(token__icontains=search_keyword) for q in querysets]
-            else:
-                querysets = [q.filter(token__regex=search_keyword) for q in querysets]
-
-
-            queryset = set()
-            
-            for query in querysets:
-                for k in query:
-                    for b in k.books.all():
-                        queryset.add(b)
-
-        else:
-            queryset = Book.objects.all()
-            if language is not None:
-                queryset = queryset.filter(language__code=language)
-
+        if language is not None:
+            queryset = queryset.filter(language__code=language)
         
         search_name_author = request.GET.get('author_name')
         if search_name_author is not None:
@@ -67,9 +34,42 @@ class BookViewSet(APIView):
             
             search_title_type = "classique" if search_title_type is None else search_title_type
             if search_title_type == "classique":
-                queryset.filter(authors__name__icontains=search_title)
+                queryset = queryset.filter(title__icontains=search_title)
             else:
-                queryset = queryset.filter(authors__name__regex=search_title)
+                queryset = queryset.filter(title__regex=search_title)
+                
+        search_keyword = request.GET.get('keyword')
+        if search_keyword is not None:
+            
+            search_keywords_type = request.GET.get('keyword_type')
+            search_keywords_type = "classique" if search_keywords_type is None else search_keywords_type
+            
+            if language is not None:
+                if language == 'en':
+                    if search_keywords_type == "classique":
+                        queryset = queryset.filter(keywordsenglish__token__icontains=search_keyword)
+                    else:
+                        queryset = queryset.filter(keywordsenglish__token__regex=search_keyword)
+                elif language == 'fr':
+                    if search_keywords_type == "classique":
+                        queryset = queryset.filter(keywordsfrench__token__icontains=search_keyword)
+                    else:
+                         queryset = queryset.filter(keywordsfrench__token__regex=search_keyword)
+                else:
+                    if search_keywords_type == "classique":
+                        queryset = queryset.filter(keywordsfrench__token__icontains=search_keyword)
+                        queryset = queryset.filter(keywordsenglish__token__icontains=search_keyword)
+                    else:
+                        queryset = queryset.filter(keywordsfrench__token__regex=search_keyword)
+                        queryset = queryset.filter(keywordsenglish__token__regex=search_keyword)
+                
+            else:
+                if search_keywords_type == "classique":
+                    queryset = queryset.filter(keywordsfrench__token__icontains=search_keyword)
+                    queryset = queryset.filter(keywordsenglish__token__icontains=search_keyword)
+                else:
+                    queryset = queryset.filter(keywordsfrench__token__regex=search_keyword)
+                    queryset = queryset.filter(keywordsenglish__token__regex=search_keyword)
         
         sort = request.GET.get('sort')
         if sort == 'download_count':

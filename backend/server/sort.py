@@ -7,18 +7,12 @@ from backend.config import URL_NEIGHBOR, URL_BASE, construct_url_requete_search
 URL_REQUETE_NEIGHBOR = URL_BASE + URL_BASE_DATA + URL_NEIGHBOR
 NUMBER_SUGGESTION = 10
 
-#Sort by popularity
-def sort_search(search, centrality):
-    return sort_by_centrality(search, centrality)
-
-    
 
 def suggestion(book_ids):
     book_suggestion = []
     book_suggestion_id = set()
     number_book_in_suggestion = 0
     
-    print(book_ids)
     for identifiant in book_ids[:3]:  
         url_requete = construct_url_requete_search(URL_REQUETE_NEIGHBOR) + str(identifiant)
         results = requests.get(url_requete)
@@ -38,7 +32,7 @@ def suggestion(book_ids):
 def intersection(lst1, lst2):
     return list(set(lst1) & set(lst2))
 
-def sort_by_centrality(search, centrality):
+def sort_by_centrality(search, centrality, ordre):
     G = UnweightedGraph() if centrality == Centrality.BETWEENNESS else WeightedGraph()
     for book in search:
         G.add_node(book)
@@ -59,7 +53,7 @@ def sort_by_centrality(search, centrality):
         compute_betweenness_centrality(G)
     else:
         compute_closeness_centrality(G)
-    G.sort_nodes_by_centrality_measure()
+    G.sort_nodes_by_centrality_measure(ordre)
     
     return [n.json for n in G.nodes]
 

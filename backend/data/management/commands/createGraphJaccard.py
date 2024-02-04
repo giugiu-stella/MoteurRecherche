@@ -1,7 +1,7 @@
 from django.core.management import BaseCommand
 from data.models import *
 import requests
-from data.jaccard import tokenarisation_occurences, jaccard_distance
+from data.jaccard import jaccard_distance
 import time
 import json
 import os
@@ -23,14 +23,9 @@ class Command(BaseCommand):
         self.stdout.write(self.style.SUCCESS('['+time.ctime()+f'] Successfully added the book {pk1} and book {pk2} as neighbor'))
     
     def handle(self, *args, **options):
-        Neighbors.delete
-        self.stdout.write('['+time.ctime()+'] Extracting keywords and their occurencesof the books...')
-        books_occurences = {book.pk : tokenarisation_occurences(requests.get(book.plain_text).text) for book in Book.objects.all()}
-        
         books_occurences = dict()
-        
         #using  json file
-        '''dossier_occu = "./keywords/"
+        dossier_occu = "./keywords/"
         for nom_fichier in os.listdir(dossier_occu):
             chemin_fichier = os.path.join(dossier_occu, nom_fichier)
 
@@ -38,9 +33,8 @@ class Command(BaseCommand):
                 token = json.load(fichier)
                 
             pk = int(nom_fichier.split('.')[0])
-            books_occurences[pk] = token'''
+            books_occurences[pk] = token
         
-        self.stdout.write('['+time.ctime()+'] Tokenization of the books finished...')
 
         self.stdout.write('['+time.ctime()+'] Creating the jaccard graph...')
         neighbor = {pk : [] for pk in books_occurences.keys()}
@@ -50,7 +44,7 @@ class Command(BaseCommand):
             book_neighbor = neighbor[pk]
                 
             for pk2 in books_occurences.keys():
-                if pk2 in book_neighbor[pk] or pk == pk2:
+                if pk2 in book_neighbor or pk == pk2:
                     continue
                 if jaccard_distance(tokens, books_occurences[pk2]) < JACCARD_DISTANCE_THRESHOLD:
                     self.add_as_neighbor(pk, pk2)

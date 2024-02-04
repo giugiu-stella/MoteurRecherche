@@ -5,15 +5,18 @@ import requests
 import re
 from data.config import URL_INIT_BIBLIOTHEQUE, MIN_NB_LIVRE_BIBLIOTHEQUE, MIN_NB_MOTS_LIVRES
 import time
+import os
 
+DOM = '\ufeff'
+dossier_book = "books/"
 
 def compter_mots(url_du_livre):
     fichier = requests.get(url_du_livre)
-    fichier.raise_for_status()  # Lèvera une exception pour les codes d'erreur HTTP
+    fichier.raise_for_status() 
     contenu = fichier.text
     mots = re.findall(r'\b\w+\b', contenu)
     nombre_de_mots = len(mots)
-    return nombre_de_mots
+    return contenu, nombre_de_mots
 
 
 def put_book_db(book):
@@ -84,6 +87,8 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         nb_livres = 0
         url = URL_INIT_BIBLIOTHEQUE
+        if not os.path.exists(dossier_book):
+            os.makedirs(dossier_book)
 
         while nb_livres < MIN_NB_LIVRE_BIBLIOTHEQUE:
             reponse = requests.get(url)
@@ -91,9 +96,19 @@ class Command(BaseCommand):
 
             for book in json_data['results']:
                 try:
-                    if compter_mots(book['formats']['text/plain; charset=us-ascii']) >= MIN_NB_MOTS_LIVRES:
-                        print(book['title'])
+                    contenu, nb_mot = compter_mots(book['formats']['text/plain; charset=us-ascii']) 
+                    if nb_mot >= MIN_NB_MOTS_LIVRES:
                         put_book_db(book)
+                        
+                        # enlève le DOM
+                        if len(contenu) > 0 and contenu[0] == DOM:
+                            contenu = contenu[1:]
+                            
+                        
+                        chemin_fichier = os.path.join(dossier_book, str(book['id']) + ".txt")
+                        with open(chemin_fichier, 'w') as fichier:
+                            fichier.write(contenu)
+                        
                         nb_livres += 1
                         self.stdout.write(self.style.SUCCESS(
                             '[' + time.ctime() + '] Successfully added book id="%s"' % book['id']))

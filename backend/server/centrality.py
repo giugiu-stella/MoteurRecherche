@@ -9,7 +9,6 @@ class Centrality(Enum):
 def compute_betweenness_centrality(G : UnweightedGraph):
         C_B = {w : 0 for w in G.nodes}
         for s in G.nodes:
-            print(s)
             S = deque()
             P = dict()
             sigma = dict()
@@ -46,7 +45,6 @@ def compute_betweenness_centrality(G : UnweightedGraph):
                 
             while len(S) != 0:
                 w = S.pop()
-                print(f'w {w}')
                 for v in P[w]:
                     delta[v] += (sigma[v] / sigma[w]) * (1 + delta[w])
                 if w != s:

@@ -25,8 +25,11 @@ class Graph:
     def __init__(self):
         self.nodes = []
     
-    def sort_nodes_by_centrality_measure(self):
-        self.nodes.sort(key=lambda x: x.centrality_measure)
+    def sort_nodes_by_centrality_measure(self, ordre):
+        if ord == "descending":
+            self.nodes.sort(key=lambda x: -x.centrality_measure)
+        else:
+            self.nodes.sort(key=lambda x: x.centrality_measure)
         
     def get_json_nodes(self):
         return [node.json for node in self.nodes]
