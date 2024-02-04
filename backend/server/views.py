@@ -16,7 +16,6 @@ class BooksList(APIView):
         results = requests.get(url)
 
         results = results.json()
-        print(f"results : {len(results)}")
         
         sort = self.request.GET.get('sort')
         ordre = request.GET.get('order')
@@ -29,7 +28,6 @@ class BooksList(APIView):
           
         results = {"result" : results, "suggestion" : suggestion([b['id'] for b in results])}
 
-        print(f"final result {len(results['result'])} {len(results['suggestion'])}")
         return Response(results)
 
     

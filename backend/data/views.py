@@ -80,6 +80,7 @@ class BookViewSet(APIView):
             else:
                 queryset = queryset.order_by('download_count')    
             
+        queryset.distinct()
         serializer = BookSerializer(queryset, many=True)
         return Response(serializer.data)
 
